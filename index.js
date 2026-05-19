@@ -35,17 +35,11 @@ async function run() {
 
     app.post("/add-facility", async (req, res) => {
       const facilitysData = req.body;
+      console.log("Received facility data:", facilitysData);
       const result = await facilitysCollection.insertOne(facilitysData);
       res.status(201).json(result);
     });
-
     
-    // Test route using DB
-    app.get("/sports", async (req, res) => {
-      const sports = await sportsCollection.find({}).toArray();
-      res.json(sports);
-    });
-
     console.log("Connected to MongoDB successfully!");
   } catch (error) {
     console.error(error);
