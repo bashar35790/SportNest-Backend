@@ -29,17 +29,22 @@ async function run() {
   try {
     // Connect to MongoDB
     await client.connect();
-    
+
     const database = client.db("sportnest");
     const facilitysCollection = database.collection("Facilitys");
 
     app.post("/add-facility", async (req, res) => {
-      const facilitysData = req.body;
-      console.log("Received facility data:", facilitysData);
-      const result = await facilitysCollection.insertOne(facilitysData);
-      res.status(201).json(result);
+      try {
+        const facilitysData = req.body;
+        console.log("Received facility data:", facilitysData);
+        const result = await facilitysCollection.insertOne(facilitysData);
+        res.status(201).json(result);
+      } catch (error) {
+        console.error("Failed to insert facility:", error);
+        res.status(500).json({ message: "Internal server error while adding facility", error: error.message });
+      }
     });
-    
+
     console.log("Connected to MongoDB successfully!");
   } catch (error) {
     console.error(error);
