@@ -45,6 +45,19 @@ async function run() {
       }
     });
 
+    app.get('/featured', async (req, res) => {
+      try {
+        const facilities = await facilitysCollection.find()
+          .sort({ bookingCount: -1 })
+          .limit(6);
+        const facilitiesArray = await facilities.toArray();
+
+        res.json({ success: true, facilities: facilitiesArray });
+      } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+      }
+    });
+
     console.log("Connected to MongoDB successfully!");
   } catch (error) {
     console.error(error);
