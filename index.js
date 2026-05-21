@@ -58,6 +58,21 @@ async function run() {
       }
     });
 
+    app.get("/all-facility", async (req, res) => {
+      const search = req.query.search;
+      let query = {};
+      if (search) {
+        query = {
+          $or: [
+            { name: { $regex: search, $options: "i" } },
+            { location: { $regex: search, $options: "i" } }
+          ]
+        };
+      }
+      const result = await facilitysCollection.find(query).toArray();
+      res.json(result);
+    });
+
     console.log("Connected to MongoDB successfully!");
   } catch (error) {
     console.error(error);
