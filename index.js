@@ -5,7 +5,7 @@ dns.setServers(["8.8.8.8", "8.8.4.4"]);
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 dotenv.config();
 
@@ -32,6 +32,7 @@ async function run() {
 
     const database = client.db("sportnest");
     const facilitysCollection = database.collection("Facilitys");
+    const bookingsCollection = database.collection("Bookings");
 
     app.post("/add-facility", async (req, res) => {
       try {
@@ -41,13 +42,17 @@ async function run() {
         res.status(201).json(result);
       } catch (error) {
         console.error("Failed to insert facility:", error);
-        res.status(500).json({ message: "Internal server error while adding facility", error: error.message });
+        res.status(500).json({
+          message: "Internal server error while adding facility",
+          error: error.message,
+        });
       }
     });
 
-    app.get('/featured', async (req, res) => {
+    app.get("/featured", async (req, res) => {
       try {
-        const facilities = await facilitysCollection.find()
+        const facilities = await facilitysCollection
+          .find()
           .sort({ bookingCount: -1 })
           .limit(6);
         const facilitiesArray = await facilities.toArray();
@@ -65,12 +70,28 @@ async function run() {
         query = {
           $or: [
             { name: { $regex: search, $options: "i" } },
-            { location: { $regex: search, $options: "i" } }
-          ]
+            { location: { $regex: search, $options: "i" } },
+          ],
         };
       }
       const result = await facilitysCollection.find(query).toArray();
       res.json(result);
+    });
+
+    app.get("/all-facility/:id", async (req, res) => {
+      try {
+        const id = req.params.id;
+        const facilitysData = await facilitysCollection.findOne({
+          _id: new ObjectId(id),
+        });
+        res.json(facilitysData);
+      } catch (error) {
+        console.error("Failed to get facili`ty :", error);
+        res.status(500).json({
+          message: "Internal server error while getting facility",
+          error: error.message,
+        });
+      }
     });
 
     console.log("Connected to MongoDB successfully!");
