@@ -94,6 +94,38 @@ async function run() {
       }
     });
 
+    app.post("/booking", async (req, res) => {
+      try {
+        const bookingData = req.body;
+        console.log("Received booking data:", bookingData);
+        const result = await bookingsCollection.insertOne(bookingData);
+        res.status(201).json(result);
+        console.log("Booking inserted successfully");
+      } catch (error) {
+        console.error("Failed to insert booking:", error);
+        res.status(500).json({
+          message: "Internal server error while booking",
+          error: error.message,
+        });
+      }
+    });
+
+    // Read User Bookings
+    app.get("/bookings/user/:email", async (req, res) => {
+      try {
+        const email = req.params.email;
+        const query = { user_email: email };
+        const result = await bookingsCollection.find(query).toArray();
+        res.json(result);
+      } catch (error) {
+        console.error("Failed to get user bookings:", error);
+        res.status(500).json({
+          message: "Internal server error while getting bookings",
+          error: error.message,
+        });
+      }
+    });
+
     console.log("Connected to MongoDB successfully!");
   } catch (error) {
     console.error(error);
