@@ -111,10 +111,10 @@ async function run() {
     });
 
     // Read User Bookings
-    app.get("/bookings/user/:email", async (req, res) => {
+    app.get("/my-bookings/:userId", async (req, res) => {
       try {
-        const email = req.params.email;
-        const query = { user_email: email };
+        const { userId } = req.params;
+        const query = { userId };
         const result = await bookingsCollection.find(query).toArray();
         res.json(result);
       } catch (error) {
