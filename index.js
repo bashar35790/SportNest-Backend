@@ -142,6 +142,41 @@ async function run() {
       }
     });
 
+    // user-specific facilities
+    app.get("/facilities/user/:userId", async (req, res) => {
+      try {
+        const { userId } = req.params;
+
+        const result = await facilitysCollection.find({ userId }).toArray();
+
+        res.status(200).json({
+          success: true,
+          facilities: result,
+        });
+      } catch (error) {
+        res.status(500).json({
+          success: false,
+          message: error.message,
+        });
+      }
+    });
+
+    app.patch("/facilities/user/:id", async (req, res) => {
+      try {
+        const { id } = req.params;
+        const updatedFacility = req.body;
+        const query = { _id: new ObjectId(id) };
+        const result = await facilitysCollection.updateOne(query, {
+          $set: updatedFacility,
+        });
+        res.json({ success: true, data: result });
+      } catch (error) {
+        res.status(500).json({
+          message: "Internal server error while updating facility",
+          error: error.message,
+        });
+      }
+    });
     console.log("Connected to MongoDB successfully!");
   } catch (error) {
     console.error(error);
