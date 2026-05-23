@@ -126,6 +126,22 @@ async function run() {
       }
     });
 
+    // Delete User Booking
+    app.delete("/my-bookings/:bookingId", async (req, res) => {
+      try {
+        const { bookingId } = req.params;
+        const query = { _id: new ObjectId(bookingId) };
+        const result = await bookingsCollection.deleteOne(query);
+        res.json(result);
+      } catch (error) {
+        console.error("Failed to delete booking:", error);
+        res.status(500).json({
+          message: "Internal server error while deleting booking",
+          error: error.message,
+        });
+      }
+    });
+
     console.log("Connected to MongoDB successfully!");
   } catch (error) {
     console.error(error);
