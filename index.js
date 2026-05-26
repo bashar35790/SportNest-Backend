@@ -177,6 +177,21 @@ async function run() {
         });
       }
     });
+
+    app.delete("/facilities/user/:id", async (req, res) => {
+      try {
+        const { id } = req.params;
+        const query = { _id: new ObjectId(id) };
+        const result = await facilitysCollection.deleteOne(query);
+        res.json({ success: true, data: result });
+      } catch (error) {
+        res.status(500).json({
+          message: "Internal server error while deleting facility",
+          error: error.message,
+        });
+      }
+    });
+
     console.log("Connected to MongoDB successfully!");
   } catch (error) {
     console.error(error);
